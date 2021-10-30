@@ -4,14 +4,14 @@ N:
 M:
 .word 3 #number of rows
 matrix:
-.word 10, 8, 3, 2
+.word 1, 8, 3, 20
 .word 4, 2, 5, 6
 .word 6, 4, 2, 7
 
 result:
 .word 1, 1
-.text 
 
+.text 
 main:
 la t0, M        #t0 = addr M
 lw t4, 0(t0)    #t4 = M
@@ -50,9 +50,6 @@ addi a2, a2, 4      #a2 = addr of next element of matrix
 bne a2, a3, push_matrix #if a2 not in the end of matrix then contine
 ret
 
-###################################
-
-###################################
 find_index_of_max:
 lw t0, 0(sp)    #t0 - counter of rows from M to 0
 addi sp, sp, 4  #move stack pointer to next element
@@ -65,7 +62,7 @@ addi a1, t6, -1  #a1 = N-1 - index_y of last matrix element
 addi t6, t6, -1 #t6 = N-1 - next column
 #call cycle_row
 #ret
-bge x0, t6, next_row    #if colunm number is 0 change row number
+beq x0, t6, next_row    #if colunm number is 0 change row number
 cycle_row:
 lw t4, 0(sp)            #t4 = max value, sp on the same place
 addi sp, sp, 4          #move stack pointer to next element
@@ -91,7 +88,7 @@ sw t5, 0(sp)        #push max (t5)
 addi t6, t6, -1     #t6 = next column 
 #jal cycle_row
 bne x0, t6, cycle_row
-ret
+beq x0, t6, next_row 
 
 
 
