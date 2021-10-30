@@ -4,13 +4,13 @@ N:
 M:
 .word 3 #number of rows
 matrix:
-.word 1, 8, 3, 2
+.word 10, 8, 3, 2
 .word 4, 2, 5, 6
 .word 6, 4, 2, 7
 
 result:
-.word 0
-.text
+.word 1, 1
+.text 
 
 main:
 la t0, M        #t0 = addr M
@@ -31,6 +31,12 @@ sw t4, 0(sp)        #push M in the stack
 
 
 call find_index_of_max
+
+la t0, result
+sw a0, 0(t0)
+addi t0, t0, 4
+sw a1, 0(t0)
+addi a3, t0, -4
 call print
 call exit
 
@@ -54,14 +60,13 @@ lw t6, 0(sp)    #t6 - counter of colunms from N to 0
 add t2, x0, t6  #t2 = N (save N value to restore for each new column) 
 addi sp, sp, 4  #move stack pointer to next element
 #a0 and a1 will be resulted indexes x and y
-add a0, x0, t0  #a0 = M - index_x of last matrix element
-add a1, x0, t6  #a1 = N - index_y of last matrix element
+addi a0, t0, -1  #a0 = M-1 - index_x of last matrix element
+addi a1, t6, -1  #a1 = N-1 - index_y of last matrix element
 addi t6, t6, -1 #t6 = N-1 - next column
-call cycle_row
-ret
-
-cycle_row:
+#call cycle_row
+#ret
 bge x0, t6, next_row    #if colunm number is 0 change row number
+cycle_row:
 lw t4, 0(sp)            #t4 = max value, sp on the same place
 addi sp, sp, 4          #move stack pointer to next element
 lw t5, 0(sp)            #t5 = current value
@@ -69,7 +74,13 @@ lw t5, 0(sp)            #t5 = current value
 bge t5, t4, change_ind  #if current > max value, change index
 sw t4, 0(sp)            #push max (t4)
 addi t6, t6, -1         #t6 = next column 
-jal cycle_row
+#jal cycle_row
+bne x0, t6, cycle_row
+next_row:
+addi t0, t0, -1         #t0 = number of next row
+add t6, t2, x0          #t6 = N
+blt x0, t0, cycle_row   #if t > 0 continue  
+ret
 
 change_ind:
 mv a0, t0           #a0 = current row
@@ -78,49 +89,58 @@ mv a1, t6           #a1 = current column
 addi a1, a1, -1     #a1 = index of current column
 sw t5, 0(sp)        #push max (t5)
 addi t6, t6, -1     #t6 = next column 
-jal cycle_row
+#jal cycle_row
+bne x0, t6, cycle_row
+ret
 
 
-next_row:
-addi t0, t0, -1         #t0 = number of next row
-add t6, t2, x0          #t6 = N
-blt x0, t0, cycle_row   #if t > 0 continue  
-#ret
+
 #jal cycle_row
 
 ###################################
 
 print:
-lw t1, 0(a2)
-
-addi t2, x0, 0
-print_cycle:
 addi a0, x0, 1 # print_int ecall
 lw a1, 0(a3)
 ecall
-
-addi a0, x0, 11 # print_char ecall
-addi a1, x0, 32
-ecall
-
-addi t2, t2, 1
 addi a3, a3, 4
-blt t2, t1, print_cycle
+lw a1, 0(a3)
+ecall 
 ret
 
 exit:
 addi a0, x0, 10
 ecall
 
-process:
-lw t1, 0(a2) # N
-lw t2, 0(a3) # M
 
-addi t4, x0, 0 # row pointer
+# lw t1, 0(a2)
 
-init:
-addi t5, x0, 0 # result to save
-addi t3, x0, 0 # row element number
+# addi t2, x0, 0
+# print_cycle:
+# addi a0, x0, 1 # print_int ecall
+# lw a1, 0(a3)
+# ecall
+
+# addi a0, x0, 11 # print_char ecall
+# addi a1, x0, 32
+# ecall
+
+# addi t2, t2, 1
+# addi a3, a3, 4
+# blt t2, t1, print_cycle
+# ret
+
+
+
+# process:
+# lw t1, 0(a2) # N
+# lw t2, 0(a3) # M
+
+# addi t4, x0, 0 # row pointer
+
+# init:
+# addi t5, x0, 0 # result to save
+# addi t3, x0, 0 # row element number
 
 # cycle:
 # lw t6, 0(a4) # load value from array
