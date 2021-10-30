@@ -41,7 +41,7 @@ void find_max_ind (Stack_t stack, int N, int* max_x, int* max_y) {
 	while (stack.size) {
 		count--;			// number of next element in stack
         temp = pop(&stack);	// next element from stack
-		if (temp > max) {	// if temporary element is bigger than max
+		if (temp >= max) {	// if temporary element is bigger than max
             max = temp;		// save temp as max
             *max_x = count-1;	//save max index in stack as max_x 
         }
